@@ -142,9 +142,10 @@ module.exports = React.createClass({
     },
 
     renderCell: function(props, column, index){
-
         var text = props.data[column.name]
         var columns = props.columns
+
+        var editing = props.editRowIndex === props.index && props.editColIndex === index
 
         var cellProps = {
             key        : column.name,
@@ -156,7 +157,10 @@ module.exports = React.createClass({
             style      : column.style,
             textPadding: props.cellPadding,
             renderCell : props.renderCell,
-            renderText : props.renderText
+            renderText : props.renderText,
+            editing    : editing,
+            onCellClick: props.onCellClick,
+            onCellEdit : props.onCellEdit
         }
 
         if (typeof column.render == 'function'){

@@ -9,6 +9,8 @@ var DataGrid = require('./src')
 var faker = window.faker = require('faker');
 var preventDefault = require('./src/utils/preventDefault')
 
+var CustomEditor = require('./src/editors/Input');
+
 var gen = (function(){
 
     var cache = {}
@@ -72,12 +74,13 @@ var columns = [
     {
         name: 'lastName',
         minWidth: 100,
-        width: 350
+        width: 350,
+        editor: CustomEditor
     }
 ]
 
 var ROW_HEIGHT = 31
-var LEN = 1000
+var LEN = 2000
 var SORT_INFO = []//[ { name: 'id', dir: 'asc'} ]
 var sort = sorty(SORT_INFO)
 var data = gen(LEN)
@@ -128,6 +131,23 @@ var App = React.createClass({
         data = [].concat(origData)
 
         this.setState({})
+    },
+
+    onCellEdit: function(rowIndex, columnName, value) {
+        console.log('onCellEdit', value, rowIndex, columnName);
+
+        // If this were a Flux based application, you might
+        // fire an action here to persist the change to
+        // a database, for example. Here we just change the
+        // data inline so the change is reflected in subsequent
+        // renders.
+
+        // Find the row and column the change happened in
+        var row = data[rowIndex];
+
+        if (row && row[columnName] !== value) {
+            row[columnName] = value;
+        }
     },
 
     render: function(){
@@ -233,9 +253,9 @@ var App = React.createClass({
                 xemptyText='testing'
                 cellPadding={'0px 5px'}
                 xpageSize={PAGE_SIZE}
-                xdata={data}
+                data={data}
                 pageSize={PAGE_SIZE}
-                dataSource='http://5.101.99.47:8090/5000'
+                xdataSource='http://5.101.99.47:8090/5000'
                 page={PAGE}
                 onPageSizeChange={this.onPageSizeChange}
                 onPageChange={this.onPageChange}
@@ -247,7 +267,9 @@ var App = React.createClass({
                     xshowSeparators: false
                 }}
                 onDataSourceLoaded={this.onLoaded}
+                onCellEdited={this.onCellEdit}
                 columns={columns}/>
+
 
         </div>
     },
